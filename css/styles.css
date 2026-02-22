@@ -36,7 +36,8 @@ body {
 }
 
 h1, h2, h3, h4 {
-  font-family: 'Press Start 2P', cursive;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
 }
 
 /* Header */
@@ -53,8 +54,9 @@ header {
 }
 
 .logo {
-  font-family: 'Press Start 2P', cursive;
-  font-size: 18px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
   color: var(--accent-secondary);
   text-decoration: none;
   display: flex;
@@ -185,10 +187,13 @@ main {
 }
 
 .page-title {
-  font-size: 18px;
+  font-size: 28px;
+  font-weight: 700;
   margin-bottom: 32px;
   text-align: center;
   color: var(--accent-secondary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 /* Generation Summary Card */
@@ -204,8 +209,9 @@ main {
 }
 
 .gen-summary-title {
-  font-family: 'Press Start 2P', cursive;
-  font-size: 14px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
   color: var(--accent-secondary);
   margin-bottom: 16px;
 }
@@ -299,8 +305,9 @@ main {
 .gen-card[data-gen="8"]:hover { box-shadow: 0 20px 40px rgba(223, 230, 233, 0.3); }
 
 .gen-number {
-  font-family: 'Press Start 2P', cursive;
-  font-size: 12px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
   color: var(--accent-primary);
   margin-bottom: 8px;
 }
