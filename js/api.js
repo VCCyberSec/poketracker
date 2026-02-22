@@ -11,12 +11,28 @@ const GEN_RANGES = {
   8: { start: 810, end: 905, region: 'Galar', name: 'Generation VIII' }
 };
 
-async function fetchWithRetry(url, retries = 3) {
+async function fetchWithTimeout(url, timeout = 10000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+async function fetchWithRetry(url, retries = 3, timeout = 10000) {
   for (let i = 0; i < retries; i++) {
     try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return await response.json();
+      return await fetchWithTimeout(url, timeout);
     } catch (error) {
       if (i === retries - 1) throw error;
       await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
@@ -26,16 +42,26 @@ async function fetchWithRetry(url, retries = 3) {
 
 async function fetchPokemonList(start, end) {
   const promises = [];
+  const delay = 50;
+  
   for (let i = start; i <= end; i++) {
-    promises.push(fetchPokemon(i));
+    const promise = fetchPokemon(i).then(p => {
+      return new Promise(resolve => setTimeout(() => resolve(p), delay));
+    });
+    promises.push(promise);
   }
   return Promise.all(promises);
 }
 
 async function fetchPokemonBatch(start, count = 30) {
   const promises = [];
+  const delay = 30;
+  
   for (let i = start; i < start + count && i <= 905; i++) {
-    promises.push(fetchPokemon(i));
+    const promise = fetchPokemon(i).then(p => {
+      return new Promise(resolve => setTimeout(() => resolve(p), delay));
+    });
+    promises.push(promise);
   }
   return Promise.all(promises);
 }
@@ -51,17 +77,26 @@ async function searchPokemon(query) {
     } catch (e) {}
   }
   
-  for (let i = 1; i <= 905 && results.length < 20; i++) {
-    if (results.length >= 20) break;
-    if (i === searchId) continue;
+  try {
+    const data = await fetchWithRetry(`${BASE_URL}/pokemon?limit=905`, 2, 5000);
+    const allPokemon = data.results;
     
-    try {
-      const pokemon = await fetchPokemon(i);
-      if (pokemon.name.toLowerCase().includes(query.toLowerCase()) ||
-          pokemon.types.some(t => t.toLowerCase().includes(query.toLowerCase()))) {
-        results.push(pokemon);
-      }
-    } catch (e) {}
+    for (const p of allPokemon) {
+      if (results.length >= 20) break;
+      
+      const id = parseInt(p.url.split('/').filter(Boolean).pop());
+      if (id === searchId) continue;
+      
+      try {
+        const pokemon = await fetchPokemon(id);
+        if (pokemon.name.toLowerCase().includes(query.toLowerCase()) ||
+            pokemon.types.some(t => t.toLowerCase().includes(query.toLowerCase()))) {
+          results.push(pokemon);
+        }
+      } catch (e) {}
+    }
+  } catch (e) {
+    console.error('Search failed:', e);
   }
   
   return results;

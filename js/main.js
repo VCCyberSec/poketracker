@@ -9,6 +9,7 @@ function showError(message) {
   return `<div class="error">
     <h2>Oops!</h2>
     <p>${message}</p>
+    <button onclick="location.reload()" class="filter-btn" style="margin-top: 16px;">Try Again</button>
   </div>`;
 }
 
@@ -69,8 +70,16 @@ async function renderGenerationCards() {
   
   container.innerHTML = showLoading();
   
+  const timeoutPromise = new Promise((_, reject) => 
+    setTimeout(() => reject(new Error('Timeout')), 15000)
+  );
+  
   try {
-    const generations = await fetchAllGenerations();
+    const generations = await Promise.race([
+      fetchAllGenerations(),
+      timeoutPromise
+    ]);
+    
     let html = '<div class="gen-grid">';
     
     for (const gen of generations) {
@@ -91,7 +100,7 @@ async function renderGenerationCards() {
     html += '</div>';
     container.innerHTML = html;
   } catch (error) {
-    container.innerHTML = showError('Failed to load generations. Please try again.');
+    container.innerHTML = showError('Failed to load generations. Please check your connection and try again.');
     console.error(error);
   }
 }
@@ -136,14 +145,21 @@ async function initGenerationPage() {
   
   pokemonContainer.innerHTML = showLoading();
   
+  const timeoutMs = info.count > 200 ? 30000 : 20000;
+  
   try {
-    allPokemon = await fetchPokemonList(info.start, info.end);
+    const fetchPromise = fetchPokemonList(info.start, info.end);
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Timeout loading Pokémon')), timeoutMs)
+    );
+    
+    allPokemon = await Promise.race([fetchPromise, timeoutPromise]);
     displayedPokemon = [];
     renderPokemonGrid(allPokemon.slice(0, 30));
     setupInfiniteScroll();
     updateGenSummary(currentGen, info);
   } catch (error) {
-    pokemonContainer.innerHTML = showError('Failed to load Pokémon. Please try again.');
+    pokemonContainer.innerHTML = showError('Failed to load Pokémon. Please check your connection and try again.');
     console.error(error);
   }
 }
@@ -309,8 +325,17 @@ async function initPokemonDetailPage() {
   container.innerHTML = showLoading();
   
   try {
-    const pokemon = await fetchPokemon(id);
-    const gigantamaxData = await fetchGigantamaxData(id);
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Timeout')), 15000)
+    );
+    
+    const fetchPromise = (async () => {
+      const pokemon = await fetchPokemon(id);
+      const gigantamaxData = await fetchGigantamaxData(id);
+      return { pokemon, gigantamaxData };
+    })();
+    
+    const { pokemon, gigantamaxData } = await Promise.race([fetchPromise, timeoutPromise]);
     renderPokemonDetail(pokemon, gigantamaxData);
     setupSwipeNavigation();
   } catch (error) {
@@ -490,14 +515,45 @@ async function initSearchPage() {
     resultsContainer.innerHTML = showLoading();
     
     try {
-      const results = await searchPokemon(query);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Search timeout')), 10000)
+      );
+      
+      const searchPromise = searchPokemon(query);
+      const results = await Promise.race([searchPromise, timeoutPromise]);
       renderSearchResults(results);
     } catch (error) {
-      resultsContainer.innerHTML = showError('Search failed. Please try again.');
+      resultsContainer.innerHTML = showError('Search timed out. Please try again with a shorter query.');
     }
   });
   
   searchInput.focus();
+}
+
+async function performSearch(query) {
+  const searchInput = document.getElementById('search-input');
+  const resultsContainer = document.getElementById('search-results');
+  
+  if (!searchInput || !resultsContainer) return;
+  
+  if (query.length < 2) {
+    resultsContainer.innerHTML = '<p class="search-hint">Type at least 2 characters to search</p>';
+    return;
+  }
+  
+  resultsContainer.innerHTML = showLoading();
+  
+  try {
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Search timeout')), 10000)
+    );
+    
+    const searchPromise = searchPokemon(query);
+    const results = await Promise.race([searchPromise, timeoutPromise]);
+    renderSearchResults(results);
+  } catch (error) {
+    resultsContainer.innerHTML = showError('Search timed out. Please try again with a shorter query.');
+  }
 }
 
 function renderSearchResults(pokemon) {
@@ -545,11 +601,18 @@ async function initFavoritesPage() {
     }
     
     const promises = favorites.map(id => fetchPokemon(id));
-    const pokemon = await Promise.all(promises);
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Timeout')), 15000)
+    );
+    
+    const pokemon = await Promise.race([
+      Promise.all(promises),
+      timeoutPromise
+    ]);
     
     renderFavoritesGrid(pokemon);
   } catch (error) {
-    container.innerHTML = showError('Failed to load favorites.');
+    container.innerHTML = showError('Failed to load favorites. Please try again.');
   }
 }
 
@@ -594,11 +657,18 @@ async function initRecentPage() {
     }
     
     const promises = recent.map(id => fetchPokemon(id));
-    const pokemon = await Promise.all(promises);
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Timeout')), 15000)
+    );
+    
+    const pokemon = await Promise.race([
+      Promise.all(promises),
+      timeoutPromise
+    ]);
     
     renderRecentGrid(pokemon);
   } catch (error) {
-    container.innerHTML = showError('Failed to load recent.');
+    container.innerHTML = showError('Failed to load recent. Please try again.');
   }
 }
 

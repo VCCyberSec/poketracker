@@ -15,8 +15,20 @@
       <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" alt="Pokéball" class="logo-img">
       PokéTracker
     </a>
+    <div class="header-search">
+      <span class="header-search-icon">🔍</span>
+      <input type="text" class="header-search-input" id="header-search" placeholder="Search Pokémon...">
+    </div>
+    <button class="hamburger-btn" id="hamburger-btn">☰</button>
     <div class="collection-stats" id="collection-stats"><span>0</span> / 905 Pokémon</div>
   </header>
+  
+  <nav class="mobile-nav" id="mobile-nav">
+    <a href="index.html">🏠 Home</a>
+    <a href="search.html">🔍 Search</a>
+    <a href="favorites.html">⭐ Favorites</a>
+    <a href="recent.html" class="active">🕐 Recent</a>
+  </nav>
   
   <main>
     <h1 class="page-title">🕐 Recently Viewed</h1>
@@ -36,6 +48,25 @@
   <script src="js/storage.js"></script>
   <script src="js/api.js"></script>
   <script src="js/main.js"></script>
-  <script>if ('serviceWorker' in navigator) { navigator.serviceWorker.register('service-worker.js'); }</script>
+  <script>
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('service-worker.js'); }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      const hamburgerBtn = document.getElementById('hamburger-btn');
+      const mobileNav = document.getElementById('mobile-nav');
+      
+      hamburgerBtn.addEventListener('click', () => {
+        mobileNav.classList.toggle('open');
+        hamburgerBtn.textContent = mobileNav.classList.contains('open') ? '✕' : '☰';
+      });
+      
+      const headerSearch = document.getElementById('header-search');
+      headerSearch.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && headerSearch.value.trim()) {
+          window.location.href = 'search.html?q=' + encodeURIComponent(headerSearch.value.trim());
+        }
+      });
+    });
+  </script>
 </body>
 </html>
