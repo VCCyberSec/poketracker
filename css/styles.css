@@ -19,6 +19,7 @@
   --gen6: #eb4d4b;
   --gen7: #7efff5;
   --gen8: #dfe6e9;
+  --gen9: #ff6b9d;
 }
 
 * {
@@ -293,6 +294,7 @@ main {
 .gen-card[data-gen="6"]::before { background: var(--gen6); }
 .gen-card[data-gen="7"]::before { background: var(--gen7); }
 .gen-card[data-gen="8"]::before { background: var(--gen8); }
+.gen-card[data-gen="9"]::before { background: var(--gen9); }
 
 .gen-card:hover {
   transform: translateY(-8px);
@@ -308,17 +310,19 @@ main {
 .gen-card[data-gen="6"]:hover { box-shadow: 0 20px 40px rgba(235, 77, 75, 0.3); }
 .gen-card[data-gen="7"]:hover { box-shadow: 0 20px 40px rgba(126, 255, 245, 0.3); }
 .gen-card[data-gen="8"]:hover { box-shadow: 0 20px 40px rgba(223, 230, 233, 0.3); }
+.gen-card[data-gen="9"]:hover { box-shadow: 0 20px 40px rgba(255, 107, 157, 0.4); }
 
 .gen-number {
   font-family: 'Roboto', sans-serif;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 18px;
   color: var(--accent-primary);
   margin-bottom: 8px;
+  text-transform: uppercase;
 }
 
 .gen-region {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   margin-bottom: 8px;
 }
