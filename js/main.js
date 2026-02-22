@@ -113,6 +113,8 @@ let currentSort = 'number';
 let isLoadingMore = false;
 let currentPokemonId = null;
 let showGigantamax = false;
+let pokemonForms = [];
+let selectedVariantId = null;
 
 async function initGenerationPage() {
   const params = new URLSearchParams(window.location.search);
@@ -194,16 +196,19 @@ function updateGenSummary(gen, info) {
 }
 
 function setupInfiniteScroll() {
-  const sentinel = document.getElementById('scroll-sentinel');
-  if (!sentinel) return;
+  const container = document.getElementById('pokemon-container');
+  if (!container) return;
   
   const observer = new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting && !isLoadingMore) {
+    if (entries[0].isIntersecting && !isLoadingMore && displayedPokemon.length < allPokemon.length) {
       loadMorePokemon();
     }
   }, { threshold: 0.1 });
   
-  observer.observe(sentinel);
+  const sentinel = document.getElementById('scroll-sentinel');
+  if (sentinel) {
+    observer.observe(sentinel);
+  }
 }
 
 function loadMorePokemon() {
@@ -332,6 +337,8 @@ async function initPokemonDetailPage() {
     const fetchPromise = (async () => {
       const pokemon = await fetchPokemon(id);
       const gigantamaxData = await fetchGigantamaxData(id);
+      const forms = await fetchPokemonForms(id);
+      pokemonForms = forms;
       return { pokemon, gigantamaxData };
     })();
     
@@ -411,6 +418,18 @@ function renderPokemonDetail(pokemon, gigantamaxData) {
         <div class="detail-types">
           ${pokemon.types.map(t => `<span class="type-badge ${t}">${t}</span>`).join('')}
         </div>
+        ${pokemonForms.length > 1 ? `
+          <div class="variant-selector">
+            <label for="variant-select">Form / Variant</label>
+            <select id="variant-select">
+              ${pokemonForms.map(f => `
+                <option value="${f.id}" ${f.id === pokemon.id ? 'selected' : ''}>
+                  ${capitalizeWords(f.name.replace(/-/g, ' '))}
+                </option>
+              `).join('')}
+            </select>
+          </div>
+        ` : ''}
         ${hasGmax ? `<button class="gigantamax-toggle ${showGigantamax ? 'active' : ''}" id="gigantamax-toggle">⚡ Gigantamax</button>` : ''}
       </div>
     </div>
@@ -484,6 +503,16 @@ function renderPokemonDetail(pokemon, gigantamaxData) {
       showGigantamax = !showGigantamax;
       renderPokemonDetail(pokemon, gigantamaxData);
       await triggerHaptic('light');
+    });
+  }
+  
+  const variantSelect = document.getElementById('variant-select');
+  if (variantSelect) {
+    variantSelect.addEventListener('change', async (e) => {
+      const newId = parseInt(e.target.value);
+      if (newId !== pokemon.id) {
+        window.location.href = `pokemon.html?id=${newId}`;
+      }
     });
   }
 }

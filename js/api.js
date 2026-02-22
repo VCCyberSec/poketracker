@@ -199,6 +199,28 @@ async function fetchGigantamaxData(id) {
   return { hasGigantamax: hasGigantamax(id) };
 }
 
+async function fetchPokemonForms(idOrName) {
+  try {
+    const data = await fetchWithRetry(`${BASE_URL}/pokemon-species/${idOrName}`);
+    const forms = [];
+    
+    if (data.varieties && data.varieties.length > 1) {
+      for (const variety of data.varieties) {
+        const formId = parseInt(variety.pokemon.url.split('/').filter(Boolean).pop());
+        forms.push({
+          name: variety.pokemon.name,
+          id: formId,
+          isDefault: variety.is_default
+        });
+      }
+    }
+    
+    return forms;
+  } catch (e) {
+    return [];
+  }
+}
+
 function getPokemonImageUrl(id) {
   return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
 }
