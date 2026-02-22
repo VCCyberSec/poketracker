@@ -62,7 +62,7 @@ async function searchPokemon(query) {
   const searchId = parseInt(query);
   const queryLower = query.toLowerCase();
   
-  if (!isNaN(searchId) && searchId >= 1 && searchId <= 905) {
+  if (!isNaN(searchId) && searchId >= 1 && searchId <= 1025) {
     try {
       const pokemon = await fetchPokemon(searchId);
       results.push(pokemon);
@@ -76,7 +76,7 @@ async function searchPokemon(query) {
     const allPokemon = data.results;
     
     const fetchPromises = [];
-    for (const p of allPokemon.slice(0, 100)) {
+    for (const p of allPokemon.slice(0, 200)) {
       const id = parseInt(p.url.split('/').filter(Boolean).pop());
       if (results.some(r => r.id === id)) continue;
       if (results.length >= 20) break;

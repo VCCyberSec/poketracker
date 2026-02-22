@@ -98,6 +98,11 @@ let selectedVariantId = null;
 async function initGenerationPage() {
   const params = new URLSearchParams(window.location.search);
   currentGen = parseInt(params.get('gen')) || 1;
+  const filterParam = params.get('filter');
+  
+  if (filterParam === 'owned') {
+    currentFilter = 'owned';
+  }
   
   const info = getGenerationInfo(currentGen);
   if (!info) {
@@ -107,6 +112,14 @@ async function initGenerationPage() {
   
   document.getElementById('page-title').textContent = `${info.region} (Gen ${currentGen})`;
   updateGenSummary(currentGen, info);
+  
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  filterButtons.forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.filter === currentFilter) {
+      btn.classList.add('active');
+    }
+  });
   
   const navControls = document.getElementById('nav-controls');
   if (navControls) {
@@ -351,8 +364,12 @@ function renderPokemonDetail(pokemon, gigantamaxData) {
   const hasGmax = gigantamaxData?.hasGigantamax || hasGigantamax(pokemon.id);
   
   const statMap = {
-    'hp': 'HP', 'attack': 'Attack', 'defense': 'Defense',
-    'special-attack': 'Sp.Atk', 'special-defense': 'Sp.Def', 'speed': 'Speed'
+    'hp': 'HP', 
+    'attack': 'Attack', 
+    'defense': 'Defense',
+    'special-attack': 'Sp. ATK', 
+    'special-defense': 'Sp. DEF', 
+    'speed': 'Speed'
   };
   
   const maxStat = 255;
@@ -413,15 +430,17 @@ function renderPokemonDetail(pokemon, gigantamaxData) {
     
     <div class="stats-section">
       <h2>Base Stats</h2>
-      ${pokemon.stats.map(s => `
+      ${pokemon.stats.map(s => {
+        const statClass = s.name.replace('special-attack', 'spatk').replace('special-defense', 'spdef');
+        return `
         <div class="stat-row">
           <div class="stat-name">${statMap[s.name] || s.name}</div>
           <div class="stat-bar-container">
-            <div class="stat-bar ${s.name.replace('special-', 'sp')}" style="width: ${(s.value / maxStat) * 100}%"></div>
+            <div class="stat-bar ${statClass}" style="width: ${(s.value / maxStat) * 100}%"></div>
           </div>
           <div class="stat-value">${s.value}</div>
         </div>
-      `).join('')}
+      `;}).join('')}
     </div>
     
     <div class="info-grid">
@@ -500,7 +519,17 @@ async function initSearchPage() {
   
   if (!searchInput || !resultsContainer) return;
   
-  searchInput.addEventListener('input', async (e) => {
+  const doSearch = async (query) => {
+    resultsContainer.innerHTML = showLoading();
+    try {
+      const results = await searchPokemon(query);
+      renderSearchResults(results);
+    } catch (error) {
+      resultsContainer.innerHTML = showError('Search failed. Please try again.');
+    }
+  };
+  
+  searchInput.addEventListener('input', (e) => {
     const query = e.target.value.trim();
     
     if (searchTimeout) clearTimeout(searchTimeout);
@@ -510,16 +539,7 @@ async function initSearchPage() {
       return;
     }
     
-    resultsContainer.innerHTML = showLoading();
-    
-    searchTimeout = setTimeout(async () => {
-      try {
-        const results = await searchPokemon(query);
-        renderSearchResults(results);
-      } catch (error) {
-        resultsContainer.innerHTML = showError('Search failed. Please try again.');
-      }
-    }, 300);
+    searchTimeout = setTimeout(() => doSearch(query), 150);
   });
   
   searchInput.focus();
