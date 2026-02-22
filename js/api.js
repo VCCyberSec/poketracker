@@ -135,7 +135,7 @@ function getGenerationInfo(gen) {
 
 async function fetchAllGenerations() {
   const gens = [];
-  for (let i = 1; i <= 8; i++) {
+  for (let i = 1; i <= 9; i++) {
     const info = GEN_RANGES[i];
     gens.push({
       number: i,
