@@ -43,7 +43,7 @@ h1, h2, h3, h4 {
 /* Header */
 header {
   background: var(--bg-secondary);
-  padding: 16px 32px;
+  padding: 12px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -51,33 +51,31 @@ header {
   top: 0;
   z-index: 100;
   border-bottom: 3px solid var(--accent-primary);
+  gap: 16px;
 }
 
 .logo {
   font-family: 'Roboto', sans-serif;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 18px;
   color: var(--accent-secondary);
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .logo-img {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   animation: spin 4s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
 
 .collection-stats {
   font-size: 14px;
   color: var(--text-secondary);
+  flex-shrink: 0;
 }
 
 .collection-stats span {
@@ -262,6 +260,8 @@ main {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .gen-card {
@@ -953,6 +953,9 @@ main {
   display: flex;
   gap: 16px;
   margin-bottom: 24px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .stat-box {
@@ -1180,42 +1183,33 @@ footer a:hover {
     display: block;
   }
   
-  .header-search {
-    display: none;
-  }
-  
-  .collection-stats {
-    display: block;
-  }
-  
   header {
     flex-wrap: wrap;
     justify-content: center;
-    gap: 8px;
+    padding: 12px 16px;
+    gap: 10px;
   }
   
   header .logo {
-    order: 1;
+    font-size: 16px;
   }
   
-  header .hamburger-btn {
-    order: 2;
+  header .logo-img {
+    width: 28px;
+    height: 28px;
   }
   
   header .collection-stats {
-    order: 3;
-    width: 100%;
-    text-align: center;
-    margin-top: 8px;
+    font-size: 12px;
   }
 }
 
 @media (max-width: 640px) {
   header {
-    padding: 12px 16px;
     flex-direction: column;
-    gap: 12px;
     text-align: center;
+    padding: 10px 12px;
+    gap: 8px;
   }
   
   .logo {
@@ -1223,16 +1217,12 @@ footer a:hover {
   }
   
   .logo-img {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .collection-stats {
-    font-size: 12px;
+    width: 28px;
+    height: 28px;
   }
   
   .page-title {
-    font-size: 14px;
+    font-size: 20px;
     margin-bottom: 16px;
   }
   
