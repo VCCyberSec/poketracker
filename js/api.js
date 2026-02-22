@@ -72,26 +72,27 @@ async function searchPokemon(query) {
   if (results.length >= 20) return results;
   
   try {
-    const data = await fetchWithRetry(`${BASE_URL}/pokemon?limit=1025`, 2, 8000);
+    const data = await fetchWithRetry(`${BASE_URL}/pokemon?limit=1025`, 3, 15000);
     const allPokemon = data.results;
     
-    const fetchPromises = [];
-    for (const p of allPokemon.slice(0, 200)) {
-      const id = parseInt(p.url.split('/').filter(Boolean).pop());
-      if (results.some(r => r.id === id)) continue;
-      if (results.length >= 20) break;
-      
-      fetchPromises.push(
-        fetchPokemon(id).then(pokemon => {
-          if (pokemon.name.toLowerCase().includes(queryLower) ||
-              pokemon.types.some(t => t.toLowerCase().includes(queryLower))) {
-            results.push(pokemon);
-          }
-        }).catch(() => {})
-      );
-    }
+    const matchingNames = allPokemon
+      .filter(p => {
+        const name = p.name.toLowerCase();
+        return name.includes(queryLower);
+      })
+      .slice(0, 20 - results.length);
     
-    await Promise.all(fetchPromises);
+    const fetchPromises = matchingNames.map(p => {
+      const id = parseInt(p.url.split('/').filter(Boolean).pop());
+      return fetchPokemon(id).catch(() => null);
+    });
+    
+    const fetched = await Promise.all(fetchPromises);
+    fetched.forEach(p => {
+      if (p && results.length < 20) {
+        results.push(p);
+      }
+    });
   } catch (e) {
     console.error('Search failed:', e);
   }
