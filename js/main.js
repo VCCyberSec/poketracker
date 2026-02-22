@@ -43,25 +43,11 @@ function updateCollectionStats() {
 }
 
 async function triggerHaptic(type = 'light') {
-  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics) {
-    try {
-      if (type === 'success') {
-        await window.Capacitor.Plugins.Haptics.notification({ type: 'SUCCESS' });
-      } else if (type === 'warning') {
-        await window.Capacitor.Plugins.Haptics.notification({ type: 'WARNING' });
-      } else {
-        await window.Capacitor.Plugins.Haptics.impact({ style: 'light' });
-      }
-    } catch (e) {}
-  }
+  // Haptic feedback placeholder for future mobile app
 }
 
 async function triggerSelectionHaptic() {
-  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics) {
-    try {
-      await window.Capacitor.Plugins.Haptics.selectionClick();
-    } catch (e) {}
-  }
+  // Selection haptic placeholder for future mobile app
 }
 
 async function renderGenerationCards() {
