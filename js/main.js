@@ -389,7 +389,10 @@ function renderPokemonDetail(pokemon, gigantamaxData) {
     
     <div class="detail-nav">
       ${pokemon.id > 1 ? `<a href="pokemon.html?id=${pokemon.id - 1}" class="detail-nav-btn">← #${formatPokemonId(pokemon.id - 1)}</a>` : '<span></span>'}
-      <a href="generation.html?gen=${gen}" class="back-link">Back</a>
+      <span class="detail-nav-center">
+        <a href="generation.html?gen=${gen}" class="back-link">Back</a>
+        <a href="index.html" class="home-link">Home</a>
+      </span>
       ${pokemon.id < 1025 ? `<a href="pokemon.html?id=${pokemon.id + 1}" class="detail-nav-btn">#${formatPokemonId(pokemon.id + 1)} →</a>` : '<span></span>'}
     </div>
     
@@ -503,7 +506,7 @@ function renderPokemonDetail(pokemon, gigantamaxData) {
 }
 
 function getGenFromId(id) {
-  for (let gen = 1; gen <= 8; gen++) {
+  for (let gen = 1; gen <= 9; gen++) {
     const range = getGenerationInfo(gen);
     if (id >= range.start && id <= range.end) {
       return gen;

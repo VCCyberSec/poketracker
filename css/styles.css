@@ -890,6 +890,22 @@ main {
   gap: 12px;
 }
 
+.detail-nav-center {
+  display: flex;
+  gap: 16px;
+}
+
+.home-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.home-link:hover {
+  color: var(--accent-primary);
+}
+
 .detail-nav-btn {
   background: var(--card-bg);
   border: 1px solid var(--text-secondary);
