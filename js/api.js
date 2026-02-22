@@ -42,26 +42,16 @@ async function fetchWithRetry(url, retries = 3, timeout = 10000) {
 
 async function fetchPokemonList(start, end) {
   const promises = [];
-  const delay = 50;
-  
   for (let i = start; i <= end; i++) {
-    const promise = fetchPokemon(i).then(p => {
-      return new Promise(resolve => setTimeout(() => resolve(p), delay));
-    });
-    promises.push(promise);
+    promises.push(fetchPokemon(i));
   }
   return Promise.all(promises);
 }
 
 async function fetchPokemonBatch(start, count = 30) {
   const promises = [];
-  const delay = 30;
-  
   for (let i = start; i < start + count && i <= 905; i++) {
-    const promise = fetchPokemon(i).then(p => {
-      return new Promise(resolve => setTimeout(() => resolve(p), delay));
-    });
-    promises.push(promise);
+    promises.push(fetchPokemon(i));
   }
   return Promise.all(promises);
 }

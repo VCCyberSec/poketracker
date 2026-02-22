@@ -70,15 +70,8 @@ async function renderGenerationCards() {
   
   container.innerHTML = showLoading();
   
-  const timeoutPromise = new Promise((_, reject) => 
-    setTimeout(() => reject(new Error('Timeout')), 15000)
-  );
-  
   try {
-    const generations = await Promise.race([
-      fetchAllGenerations(),
-      timeoutPromise
-    ]);
+    const generations = await fetchAllGenerations();
     
     let html = '<div class="gen-grid">';
     
@@ -147,15 +140,8 @@ async function initGenerationPage() {
   
   pokemonContainer.innerHTML = showLoading();
   
-  const timeoutMs = info.count > 200 ? 30000 : 20000;
-  
   try {
-    const fetchPromise = fetchPokemonList(info.start, info.end);
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Timeout loading Pokémon')), timeoutMs)
-    );
-    
-    allPokemon = await Promise.race([fetchPromise, timeoutPromise]);
+    allPokemon = await fetchPokemonList(info.start, info.end);
     displayedPokemon = [];
     renderPokemonGrid(allPokemon.slice(0, 30));
     setupInfiniteScroll();
@@ -330,19 +316,10 @@ async function initPokemonDetailPage() {
   container.innerHTML = showLoading();
   
   try {
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Timeout')), 15000)
-    );
-    
-    const fetchPromise = (async () => {
-      const pokemon = await fetchPokemon(id);
-      const gigantamaxData = await fetchGigantamaxData(id);
-      const forms = await fetchPokemonForms(id);
-      pokemonForms = forms;
-      return { pokemon, gigantamaxData };
-    })();
-    
-    const { pokemon, gigantamaxData } = await Promise.race([fetchPromise, timeoutPromise]);
+    const pokemon = await fetchPokemon(id);
+    const gigantamaxData = await fetchGigantamaxData(id);
+    const forms = await fetchPokemonForms(id);
+    pokemonForms = forms;
     renderPokemonDetail(pokemon, gigantamaxData);
     setupSwipeNavigation();
   } catch (error) {
@@ -544,15 +521,10 @@ async function initSearchPage() {
     resultsContainer.innerHTML = showLoading();
     
     try {
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Search timeout')), 10000)
-      );
-      
-      const searchPromise = searchPokemon(query);
-      const results = await Promise.race([searchPromise, timeoutPromise]);
+      const results = await searchPokemon(query);
       renderSearchResults(results);
     } catch (error) {
-      resultsContainer.innerHTML = showError('Search timed out. Please try again with a shorter query.');
+      resultsContainer.innerHTML = showError('Search failed. Please try again.');
     }
   });
   
@@ -573,15 +545,10 @@ async function performSearch(query) {
   resultsContainer.innerHTML = showLoading();
   
   try {
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Search timeout')), 10000)
-    );
-    
-    const searchPromise = searchPokemon(query);
-    const results = await Promise.race([searchPromise, timeoutPromise]);
+    const results = await searchPokemon(query);
     renderSearchResults(results);
   } catch (error) {
-    resultsContainer.innerHTML = showError('Search timed out. Please try again with a shorter query.');
+    resultsContainer.innerHTML = showError('Search failed. Please try again.');
   }
 }
 
@@ -629,16 +596,7 @@ async function initFavoritesPage() {
       return;
     }
     
-    const promises = favorites.map(id => fetchPokemon(id));
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Timeout')), 15000)
-    );
-    
-    const pokemon = await Promise.race([
-      Promise.all(promises),
-      timeoutPromise
-    ]);
-    
+    const pokemon = await Promise.all(favorites.map(id => fetchPokemon(id)));
     renderFavoritesGrid(pokemon);
   } catch (error) {
     container.innerHTML = showError('Failed to load favorites. Please try again.');
@@ -685,16 +643,7 @@ async function initRecentPage() {
       return;
     }
     
-    const promises = recent.map(id => fetchPokemon(id));
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Timeout')), 15000)
-    );
-    
-    const pokemon = await Promise.race([
-      Promise.all(promises),
-      timeoutPromise
-    ]);
-    
+    const pokemon = await Promise.all(recent.map(id => fetchPokemon(id)));
     renderRecentGrid(pokemon);
   } catch (error) {
     container.innerHTML = showError('Failed to load recent. Please try again.');
