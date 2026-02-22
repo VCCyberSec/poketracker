@@ -8,7 +8,8 @@ const GEN_RANGES = {
   5: { start: 494, end: 649, region: 'Unova', name: 'Generation V' },
   6: { start: 650, end: 721, region: 'Kalos', name: 'Generation VI' },
   7: { start: 722, end: 809, region: 'Alola', name: 'Generation VII' },
-  8: { start: 810, end: 905, region: 'Galar', name: 'Generation VIII' }
+  8: { start: 810, end: 905, region: 'Galar', name: 'Generation VIII' },
+  9: { start: 906, end: 1025, region: 'Paldea', name: 'Generation IX' }
 };
 
 async function fetchWithTimeout(url, timeout = 10000) {
@@ -59,6 +60,7 @@ async function fetchPokemonBatch(start, count = 30) {
 async function searchPokemon(query) {
   const results = [];
   const searchId = parseInt(query);
+  const queryLower = query.toLowerCase();
   
   if (!isNaN(searchId) && searchId >= 1 && searchId <= 905) {
     try {
@@ -67,29 +69,34 @@ async function searchPokemon(query) {
     } catch (e) {}
   }
   
+  if (results.length >= 20) return results;
+  
   try {
-    const data = await fetchWithRetry(`${BASE_URL}/pokemon?limit=905`, 2, 5000);
+    const data = await fetchWithRetry(`${BASE_URL}/pokemon?limit=1025`, 2, 8000);
     const allPokemon = data.results;
     
-    for (const p of allPokemon) {
+    const fetchPromises = [];
+    for (const p of allPokemon.slice(0, 100)) {
+      const id = parseInt(p.url.split('/').filter(Boolean).pop());
+      if (results.some(r => r.id === id)) continue;
       if (results.length >= 20) break;
       
-      const id = parseInt(p.url.split('/').filter(Boolean).pop());
-      if (id === searchId) continue;
-      
-      try {
-        const pokemon = await fetchPokemon(id);
-        if (pokemon.name.toLowerCase().includes(query.toLowerCase()) ||
-            pokemon.types.some(t => t.toLowerCase().includes(query.toLowerCase()))) {
-          results.push(pokemon);
-        }
-      } catch (e) {}
+      fetchPromises.push(
+        fetchPokemon(id).then(pokemon => {
+          if (pokemon.name.toLowerCase().includes(queryLower) ||
+              pokemon.types.some(t => t.toLowerCase().includes(queryLower))) {
+            results.push(pokemon);
+          }
+        }).catch(() => {})
+      );
     }
+    
+    await Promise.all(fetchPromises);
   } catch (e) {
     console.error('Search failed:', e);
   }
   
-  return results;
+  return results.slice(0, 20);
 }
 
 async function fetchPokemon(idOrName) {
@@ -101,6 +108,7 @@ function formatPokemonData(data) {
   return {
     id: data.id,
     name: data.name,
+    species: data.species,
     types: data.types.map(t => t.type.name),
     sprites: {
       front: data.sprites.front_default,
@@ -191,8 +199,11 @@ async function fetchGigantamaxData(id) {
 
 async function fetchPokemonForms(idOrName) {
   try {
+    console.log('Fetching forms for:', idOrName);
     const data = await fetchWithRetry(`${BASE_URL}/pokemon-species/${idOrName}`);
     const forms = [];
+    
+    console.log('Varieties:', data.varieties?.length);
     
     if (data.varieties && data.varieties.length > 1) {
       for (const variety of data.varieties) {
@@ -205,8 +216,10 @@ async function fetchPokemonForms(idOrName) {
       }
     }
     
+    console.log('Forms found:', forms.length);
     return forms;
   } catch (e) {
+    console.error('Error fetching forms:', e);
     return [];
   }
 }

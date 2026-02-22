@@ -129,7 +129,7 @@ async function initGenerationPage() {
       navHtml += `<a href="generation.html?gen=${currentGen - 1}" class="nav-btn">← Prev</a>`;
     }
     navHtml += `<a href="index.html" class="nav-btn home-btn">🏠 Home</a>`;
-    if (currentGen < 8) {
+    if (currentGen < 9) {
       navHtml += `<a href="generation.html?gen=${currentGen + 1}" class="nav-btn">Next →</a>`;
     }
     navControls.innerHTML = navHtml;
@@ -142,9 +142,8 @@ async function initGenerationPage() {
   
   try {
     allPokemon = await fetchPokemonList(info.start, info.end);
-    displayedPokemon = [];
-    renderPokemonGrid(allPokemon.slice(0, 30));
-    setupInfiniteScroll();
+    displayedPokemon = allPokemon;
+    renderPokemonGrid(allPokemon);
     updateGenSummary(currentGen, info);
   } catch (error) {
     pokemonContainer.innerHTML = showError('Failed to load Pokémon. Please check your connection and try again.');
@@ -269,10 +268,6 @@ function renderPokemonGrid(pokemon) {
   
   html += '</div>';
   
-  if (displayedPokemon.length < allPokemon.length) {
-    html += '<div id="scroll-sentinel" class="loading-more">Loading more...</div>';
-  }
-  
   container.innerHTML = html;
 }
 
@@ -318,7 +313,15 @@ async function initPokemonDetailPage() {
   try {
     const pokemon = await fetchPokemon(id);
     const gigantamaxData = await fetchGigantamaxData(id);
-    const forms = await fetchPokemonForms(id);
+    
+    const speciesUrl = pokemon.species?.url;
+    let forms = [];
+    if (speciesUrl) {
+      const speciesId = parseInt(speciesUrl.split('/').filter(Boolean).pop());
+      forms = await fetchPokemonForms(speciesId);
+    }
+    
+    console.log('Pokemon forms:', forms);
     pokemonForms = forms;
     renderPokemonDetail(pokemon, gigantamaxData);
     setupSwipeNavigation();
@@ -346,7 +349,7 @@ function setupSwipeNavigation() {
     if (Math.abs(diff) > threshold) {
       triggerSelectionHaptic();
       
-      if (diff > 0 && currentPokemonId < 905) {
+      if (diff > 0 && currentPokemonId < 1025) {
         window.location.href = `pokemon.html?id=${currentPokemonId + 1}`;
       } else if (diff < 0 && currentPokemonId > 1) {
         window.location.href = `pokemon.html?id=${currentPokemonId - 1}`;
@@ -384,7 +387,7 @@ function renderPokemonDetail(pokemon, gigantamaxData) {
     <div class="detail-nav">
       ${pokemon.id > 1 ? `<a href="pokemon.html?id=${pokemon.id - 1}" class="detail-nav-btn">← #${formatPokemonId(pokemon.id - 1)}</a>` : '<span></span>'}
       <a href="generation.html?gen=${gen}" class="back-link">Back</a>
-      ${pokemon.id < 905 ? `<a href="pokemon.html?id=${pokemon.id + 1}" class="detail-nav-btn">#${formatPokemonId(pokemon.id + 1)} →</a>` : '<span></span>'}
+      ${pokemon.id < 1025 ? `<a href="pokemon.html?id=${pokemon.id + 1}" class="detail-nav-btn">#${formatPokemonId(pokemon.id + 1)} →</a>` : '<span></span>'}
     </div>
     
     <div class="detail-header">
@@ -507,11 +510,14 @@ function getGenFromId(id) {
 async function initSearchPage() {
   const searchInput = document.getElementById('search-input');
   const resultsContainer = document.getElementById('search-results');
+  let searchTimeout = null;
   
   if (!searchInput || !resultsContainer) return;
   
   searchInput.addEventListener('input', async (e) => {
     const query = e.target.value.trim();
+    
+    if (searchTimeout) clearTimeout(searchTimeout);
     
     if (query.length < 2) {
       resultsContainer.innerHTML = '<p class="search-hint">Type at least 2 characters to search</p>';
@@ -520,12 +526,14 @@ async function initSearchPage() {
     
     resultsContainer.innerHTML = showLoading();
     
-    try {
-      const results = await searchPokemon(query);
-      renderSearchResults(results);
-    } catch (error) {
-      resultsContainer.innerHTML = showError('Search failed. Please try again.');
-    }
+    searchTimeout = setTimeout(async () => {
+      try {
+        const results = await searchPokemon(query);
+        renderSearchResults(results);
+      } catch (error) {
+        resultsContainer.innerHTML = showError('Search failed. Please try again.');
+      }
+    }, 300);
   });
   
   searchInput.focus();

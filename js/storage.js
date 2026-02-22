@@ -100,7 +100,7 @@ function getCollectionStats() {
   return {
     owned: owned.length,
     favorites: favorites.length,
-    total: 905
+    total: 1025
   };
 }
 
@@ -113,7 +113,8 @@ function getGenerationStats(gen) {
     5: { start: 494, end: 649 },
     6: { start: 650, end: 721 },
     7: { start: 722, end: 809 },
-    8: { start: 810, end: 905 }
+    8: { start: 810, end: 905 },
+    9: { start: 906, end: 1025 }
   };
   
   const range = ranges[gen];
