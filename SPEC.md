@@ -1,213 +1,186 @@
-# PokeTracker - Pokémon Collection Tracker
+# Pokémon Collection Tracker - Specification
 
-## Project Overview
-- **Project Name**: PokeTracker
-- **Type**: Static website (HTML/CSS/JS)
-- **Core Functionality**: Track Pokémon collection across all 8 generations with catch counts, regional statistics, and detailed Pokémon information including Mega Evolutions and Gigantamax forms
-- **Target Users**: Pokémon collectors and fans who want to track their collection digitally
+## 1. Project Overview
 
-## API Integration
-- **Data Source**: [PokeAPI](https://pokeapi.co/)
-- **Images**: PokeAPI sprites (official-artwork for full images)
-- **Data Fetched**: Pokémon names, IDs, types, stats, sprites, forms (Mega, Gigantamax)
+- **Project Name**: PokéTracker
+- **Type**: Multi-page website/webapp
+- **Core Functionality**: A personal Pokémon collection tracker that displays Pokémon from Generations 1-8, allows users to mark which Pokémon they own, and provides detailed individual Pokémon pages with images fetched from PokéAPI.
+- **Target Users**: Pokémon collectors and enthusiasts who want to track their collection
 
-## UI/UX Specification
-
-### Color Palette
-- **Background**: `#1a1a2e` (deep navy)
-- **Surface**: `#16213e` (dark blue)
-- **Card**: `#0f3460` (medium blue)
-- **Primary**: `#e94560` (vibrant red/pink - Pokéball inspired)
-- **Secondary**: `#53d8fb` (electric blue)
-- **Accent**: `#f9ed69` (yellow - Pokémon yellow)
-- **Text Primary**: `#ffffff`
-- **Text Secondary**: `#a0a0a0`
-
-### Typography
-- **Headings**: "Press Start 2P" (Google Fonts - pixel style, Pokémon themed)
-- **Body**: "Inter", sans-serif
-- **Sizes**: 
-  - H1: 2rem
-  - H2: 1.5rem
-  - H3: 1.2rem
-  - Body: 1rem
+## 2. UI/UX Specification
 
 ### Layout Structure
 
-#### Global Navigation (sticky top)
-- Logo: "PokeTracker" with Pokéball icon
-- Nav Links: Home | Regions | Search | My Collection
-- Mobile: Hamburger menu
+**Main Pages:**
+- `index.html` - Landing page with generation selection
+- `generation.html` - Reusable page for displaying Pokémon by generation (uses URL params)
+- `pokemon.html` - Individual Pokémon detail page (uses URL params)
 
-#### Home Page (index.html)
-- Hero section with total catch count
-- 8 region cards (Kanto, Johto, Hoenn, Sinnoh, Unova, Kalos, Alola, Galar)
-- Each region card shows: Region name, map image, catch count, Pokémon count
+**Page Sections:**
+- Header: Fixed navigation with logo and collection stats
+- Main Content: Grid of Pokémon cards or generation selection
+- Footer: Credits and data source attribution
 
-#### Region Pages (region.html?region=kanto)
-- Region header with map
-- Catch count stats
-- Grid of Pokémon (filterable by type, caught/not caught)
-- Click on Pokémon to view details
+**Responsive Breakpoints:**
+- Mobile: < 640px (2 columns)
+- Tablet: 640px - 1024px (4 columns)
+- Desktop: > 1024px (6 columns)
 
-#### Pokémon Detail Page (pokemon.html?id=25)
-- Large sprite image
-- Name, ID, types
-- Stats display (HP, Attack, Defense, etc.)
-- Forms section (Mega, Gigantamax, regional variants)
-- Catch/Uncatch button
-- Evolution chain link
+### Visual Design
 
-#### Search Page (search.html)
-- Search bar with autocomplete
-- Filter by: Generation, Type, Region, Caught status
-- Results grid
+**Color Palette:**
+- Background Primary: `#0f0f23` (deep space blue)
+- Background Secondary: `#1a1a2e` (dark navy)
+- Card Background: `#16213e` (midnight blue)
+- Accent Primary: `#e94560` (pokéball red)
+- Accent Secondary: `#f9ed69` (lightning yellow)
+- Text Primary: `#eaeaea` (off-white)
+- Text Secondary: `#a0a0a0` (muted gray)
+- Owned Badge: `#4ecca3` (mint green)
+- Unowned: `#ff6b6b` (coral red)
 
-#### Collection Page (collection.html)
-- Filter tabs: All | Caught | Uncaught
-- Sort options: By ID, By Name, By Type
-- Statistics dashboard
+**Typography:**
+- Headings: "Press Start 2P" (Google Fonts - pixel art style)
+- Body: "Exo 2" (Google Fonts - clean, futuristic)
+- Logo: 24px
+- Page Titles: 18px
+- Card Names: 14px
+- Body Text: 14px
 
-### Responsive Breakpoints
-- Mobile: < 768px (single column, stacked cards)
-- Tablet: 768px - 1024px (2 columns)
-- Desktop: > 1024px (4 columns for Pokémon grid)
+**Spacing System:**
+- Base unit: 8px
+- Card padding: 16px
+- Grid gap: 16px
+- Section margins: 32px
+
+**Visual Effects:**
+- Card hover: Scale 1.05, box-shadow glow
+- Pokémon images: Subtle floating animation
+- Page transitions: Fade in (0.3s)
+- Owned indicator: Pulsing glow effect
 
 ### Components
 
-#### Pokémon Card
-- Thumbnail image
-- Name
-- ID number
-- Types (badges)
-- Caught indicator (checkmark or empty)
-- Hover: Scale up slightly, show "View Details"
+**Generation Card (Index Page):**
+- Region name with icon
+- Generation number
+- Pokémon count
+- Background gradient unique to region
+- Hover: Lift effect with glow
 
-#### Region Map Card
-- Map image
-- Region name
-- Catch progress bar
-- Total/Collected count
+**Pokémon Card (Generation Page):**
+- Pokémon sprite/image (from PokéAPI)
+- Pokémon name
+- Pokémon number (#001)
+- Owned checkbox/indicator
+- Type badges
+- Hover: Scale up, glow effect
 
-#### Search Autocomplete
-- Dropdown with matching Pokémon
-- Shows sprite + name + type
-- Keyboard navigation support
+**Pokémon Detail Page:**
+- Large Pokémon image (animated sprite if available)
+- Pokémon name and number
+- Type(s) with colored badges
+- Base stats (HP, Attack, Defense, Sp.Atk, Sp.Def, Speed)
+- Height/Weight
+- Abilities
+- Owned toggle button
+- Back to generation link
 
-### Animations
-- Page transitions: Fade in (0.3s)
-- Cards: Hover scale (1.05)
-- Buttons: Ripple effect on click
-- Loading: Pokéball spinning animation
+**Header:**
+- Logo (left)
+- Total collection count / Total Pokémon (center)
+- Theme toggle (optional)
 
-## Functionality Specification
+## 3. Functionality Specification
 
 ### Core Features
 
-1. **Catch Tracking**
-   - Click to catch/uncatch any Pokémon
-   - Persist to localStorage
-   - Visual feedback on catch
+1. **Generation Selection (Index)**
+   - Display 8 generation cards
+   - Each card links to generation.html with ?gen=X parameter
+   - Show region name, generation number, Pokémon count
 
-2. **Regional Statistics**
-   - Track catches per region (Gen 1-8 maps to regions)
-   - Kanto: Gen 1 (1-151)
-   - Johto: Gen 2 (152-251)
-   - Hoenn: Gen 3 (252-386)
-   - Sinnoh: Gen 4 (387-493)
-   - Unova: Gen 5 (494-649)
-   - Kalos: Gen 6 (650-721)
-   - Alola: Gen 7 (722-809)
-   - Galar: Gen 8 (810-905)
+2. **Generation Pokémon Grid**
+   - Fetch all Pokémon for the selected generation
+   - Display in responsive grid
+   - Show owned/unowned status
+   - Click card to go to detail page
+   - Filter: All / Owned / Missing
 
-3. **Mega Evolution Support**
-   - Include Mega forms (e.g., Mega Venusaur, Mega Charizard X/Y)
-   - Display in forms section
-   - Can be marked as caught separately
+3. **Individual Pokémon Page**
+   - Fetch Pokémon data from PokéAPI
+   - Display all stats, types, abilities
+   - Toggle owned status (saved to localStorage)
+   - Show shiny variant if available
 
-4. **Gigantamax Support**
-   - Include Gigantamax forms
-   - Display in forms section
-   - Can be marked as caught separately
-
-5. **Search**
-   - Real-time search by name
-   - Filter by type, generation, caught status
-   - Show results instantly
-
-6. **Navigation**
-   - Breadcrumb navigation on detail pages
-   - Quick jump to regions
-   - Back to top button
+4. **Collection Tracking**
+   - Store owned Pokémon in localStorage
+   - Persist across sessions
+   - Show collection progress on index page
+   - Calculate completion percentage per generation
 
 ### Data Handling
-- **API Caching**: Cache fetched data in localStorage
-- **Persistence**: All catches saved to localStorage
-- **Initial Load**: Fetch all Pokémon list, then lazy-load details
+
+- **PokéAPI Endpoints:**
+  - Generations: `https://pokeapi.co/api/v2/generation/{id}`
+  - Pokémon: `https://pokeapi.co/api/v2/pokemon/{id}`
+  - Pokémon species: `https://pokeapi.co/api/v2/pokemon-species/{id}`
+
+- **Generation Ranges:**
+  - Gen 1 (Kanto): #001 - #151
+  - Gen 2 (Johto): #152 - #251
+  - Gen 3 (Hoenn): #252 - #386
+  - Gen 4 (Sinnoh): #387 - #493
+  - Gen 5 (Unova): #494 - #649
+  - Gen 6 (Kalos): #650 - #721
+  - Gen 7 (Alola): #722 - #809
+  - Gen 8 (Galar): #810 - #905
+
+- **localStorage Schema:**
+  ```json
+  {
+    "poketracker_owned": ["1", "4", "7", "25", ...]
+  }
+  ```
 
 ### Edge Cases
-- Handle API failures gracefully with retry
-- Show placeholder for missing images
-- Handle Pokémon with no forms gracefully
+- Handle API failures gracefully with error message
+- Show loading states while fetching
+- Handle Pokémon with missing sprites
+- Support direct linking to Pokémon by ID
 
-## Regions & Maps
-
-### Region Data
-| Region | Generation | Pokémon Range | Map Image |
-|--------|------------|----------------|-----------|
-| Kanto | Gen 1 | 1-151 | kanto-map.png |
-| Johto | Gen 2 | 152-251 | johto-map.png |
-| Hoenn | Gen 3 | 252-386 | hoenn-map.png |
-| Sinnoh | Gen 4 | 387-493 | sinnoh-map.png |
-| Unova | Gen 5 | 494-649 | unova-map.png |
-| Kalos | Gen 6 | 650-721 | kalos-map.png |
-| Alola | Gen 7 | 722-809 | alola-map.png |
-| Galar | Gen 8 | 810-905 | galar-map.png |
-
-### Map Sources
-- Use placeholder/colored maps generated with CSS gradients representing each region's colors
-
-## File Structure
-```
-/poketracker
-├── index.html          # Home page
-├── region.html         # Region detail page
-├── pokemon.html        # Pokémon detail page
-├── search.html         # Search page
-├── collection.html     # My Collection page
-├── css/
-│   └── styles.css      # All styles
-├── js/
-│   ├── app.js          # Main application logic
-│   ├── api.js          # PokeAPI integration
-│   ├── storage.js      # localStorage handling
-│   └── router.js       # Simple routing
-├── assets/
-│   └── maps/           # Region map images
-└── README.md
-```
-
-## Acceptance Criteria
+## 4. Acceptance Criteria
 
 ### Visual Checkpoints
-- [ ] Dark theme with red/pink accent is visible
-- [ ] Navigation is sticky and works on mobile
-- [ ] Region cards display with maps
-- [ ] Pokémon cards show images, names, types
-- [ ] Caught Pokémon have visual indicator
+- [ ] Index page shows all 8 generations with distinct region styling
+- [ ] Generation page displays Pokémon in responsive grid
+- [ ] Pokémon cards show image, name, number, types, owned status
+- [ ] Detail page shows complete Pokémon information
+- [ ] Owned Pokémon have visible mint green indicator
+- [ ] Dark theme is consistent across all pages
+- [ ] Hover effects work on all interactive elements
 - [ ] Responsive layout works on mobile/tablet/desktop
 
 ### Functional Checkpoints
-- [ ] Can view all 905+ Pokémon
-- [ ] Can catch/uncatch Pokémon
-- [ ] Catch count persists after refresh
-- [ ] Search returns relevant results
-- [ ] Can navigate between regions
-- [ ] Can view Pokémon details
-- [ ] Mega and Gigantamax forms display
-- [ ] Region catch counts are accurate
+- [ ] Clicking generation card navigates to generation page
+- [ ] Clicking Pokémon card navigates to detail page
+- [ ] Toggling owned status updates localStorage
+- [ ] Collection count updates in real-time
+- [ ] Back navigation works correctly
+- [ ] Page loads show loading states
+- [ ] All Pokémon images load from PokéAPI
 
-### Performance
-- [ ] Initial page load < 3 seconds
-- [ ] Smooth scrolling and animations
-- [ ] No console errors on normal usage
+## 5. Technical Implementation
+
+- **Files:**
+  - `index.html` - Main landing page
+  - `generation.html` - Generation Pokémon grid
+  - `pokemon.html` - Pokémon detail page
+  - `css/styles.css` - All styles
+  - `js/main.js` - Shared functionality
+  - `js/api.js` - PokéAPI fetch functions
+  - `js/storage.js` - localStorage management
+
+- **External Resources:**
+  - Google Fonts: Press Start 2P, Exo 2
+  - PokéAPI: https://pokeapi.co/
