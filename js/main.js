@@ -127,7 +127,7 @@ async function initGenerationPage() {
     if (currentGen > 1) {
       navHtml += `<a href="generation.html?gen=${currentGen - 1}" class="nav-btn">← Prev</a>`;
     }
-    navHtml += `<a href="index.html" class="nav-btn home-btn">🏠 Home</a>`;
+    navHtml += `<a href="index.html" class="nav-btn home-btn">Home</a>`;
     if (currentGen < 9) {
       navHtml += `<a href="generation.html?gen=${currentGen + 1}" class="nav-btn">Next →</a>`;
     }
@@ -390,8 +390,8 @@ function renderPokemonDetail(pokemon, gigantamaxData) {
     <div class="detail-nav">
       ${pokemon.id > 1 ? `<a href="pokemon.html?id=${pokemon.id - 1}" class="detail-nav-btn">← #${formatPokemonId(pokemon.id - 1)}</a>` : '<span></span>'}
       <span class="detail-nav-center">
-        <a href="generation.html?gen=${gen}" class="back-link">Back</a>
-        <a href="index.html" class="home-link">Home</a>
+        <a href="index.html" class="nav-btn nav-btn-home">Home</a>
+        <a href="generation.html?gen=${gen}" class="nav-btn">Back to Generation</a>
       </span>
       ${pokemon.id < 1025 ? `<a href="pokemon.html?id=${pokemon.id + 1}" class="detail-nav-btn">#${formatPokemonId(pokemon.id + 1)} →</a>` : '<span></span>'}
     </div>
