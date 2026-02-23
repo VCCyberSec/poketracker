@@ -110,7 +110,8 @@ async function initGenerationPage() {
     return;
   }
   
-  document.getElementById('page-title').textContent = `${info.region} (Gen ${currentGen})`;
+  const pageTitle = currentFilter === 'owned' ? 'My Collection' : `${info.region} (Gen ${currentGen})`;
+  document.getElementById('page-title').textContent = pageTitle;
   updateGenSummary(currentGen, info);
   
   const filterButtons = document.querySelectorAll('.filter-btn');
