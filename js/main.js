@@ -463,8 +463,7 @@ function renderPokemonDetail(pokemon, gigantamaxData) {
       </div>
       ${hasGmax ? `<div class="info-card"><h3>Gigantamax</h3><p class="gigantamax-info">Available</p></div>` : ''}
     </div>
-    
-    <p class="swipe-hint">Swipe left/right to navigate</p>
+
   `;
   
   document.getElementById('owned-toggle').addEventListener('click', async () => {
